@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <title>Choirless Key Management</title>
+
+        <style>
+
+            *[data-active="false"]{
+                display: none !important;
+            }
+
+            body{
+                font-family: sans-serif;
+                font-size: 14px;
+            }
+
+            table{
+                border-collapse: collapse;
+            }
+
+            table thead{
+                background-color: black;
+                color: white;
+                font-weight: 800;
+            }
+
+            table thead td{
+                border: 1px solid white;
+            }
+
+            table td{
+                border: 1px solid black;
+                padding: 0.5em;
+            }
+
+            .redalert{
+                background: #d81f1f;
+                padding: 1em;
+                color: white;
+            }
+
+            #deleteDialog{
+                position: fixed;
+                top: 0;
+                left: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                height: 100%;
+                background: rgba(255, 0, 0, 0.6);
+            }
+
+            #deleteDialog #deleteDialogContent{
+                box-sizing: border-box;
+                padding: 1em 2em 2em;
+                background: white;
+                text-align: center;
+                box-shadow: 0 2px 3px black;
+            }
+
+            #deleteDialog #deleteDialogContent strong{
+                font-size: 1.5em;
+                padding: 1em;
+                display: block;
+                background: rgba(0, 0, 0, 0.0784313725490196);
+                font-family: monospace;
+                margin-top: 1em;
+            }
+
+            #deleteDialog #deleteDialogContent button{
+                font-size: 1em;
+                background: white;
+                padding: 1em;
+                margin: 0.5em;
+                border: 1px solid #0000004f;
+                color: white;
+                background: black;
+                font-weight: 800;
+                text-shadow: 0 1px 1px black;
+                box-shadow: 0 2px 3px #0000006b;
+                border-radius: 2px;
+                cursor: pointer;
+                outline: 0 solid transparent;
+            }
+
+            #deleteDialog #deleteDialogContent button#confirmKeyDeletion{
+                background: #e44343;
+            }
+
+            #deleteDialog #deleteDialogContent button#cancelKeyDeletion{
+                background: #5595d8;
+            }
+
+
+        </style>
+
+    </head>
+
+    <body>
+
+        <h1>Choirless Keys</h1>
+
+        <h2>Existing Keys</h2>
+
+        <table id="existing">
+
+            <thead>
+                <tr>
+                    <td>Key Name</td>
+                    <td>Key</td>
+                    <td>Created By</td>
+                    <td>Creation Date</td>
+                    <td>Delete?</td>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <!--<tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>-->
+
+            </tbody>
+
+        </table>
+
+        <h2>Create Key</h2>
+
+        <form method="POST" action="/keys/create" id="create">
+
+            <label>Key name</label>
+            <input type="text" name="keyname" required/>
+
+            <input type="submit" value="Create">
+
+        </form>
+
+        <div id="deleteDialog" data-active="false">
+
+            <div id="deleteDialogContent">
+                <h3>WARNING</h3>
+                <h4 class="redalert">YOU ARE ABOUT TO PERMANENTLY DELETE A KEY</h4>
+                <p>This action is irreversible and immediate. All services using this key will lose access to the API.</p>
+                <p>The key you are about to delete is:<br/><strong id="keyForDeletion">app-server</strong></p>
+
+                <h4>Are you sure you want to delete this key?</h4>
+
+                <button id="confirmKeyDeletion">Yes. Delete.</button>
+                <button id="cancelKeyDeletion">No. Cancel</button>
+
+            </div>
+
+        </div>
+        
+    </body>
+
+    <script>
+
+        (function(){
+            'use strict';
+
+            var existingKeysTable = document.querySelector('table#existing');
+            var existingKeysTableBody = existingKeysTable.querySelector('tbody');
+
+            var createNewKeyForm = document.querySelector('form#create');
+
+            var deleteDialog = document.querySelector('#deleteDialog');
+            var confirmDeleteBtn = deleteDialog.querySelector('#confirmKeyDeletion');
+            var cancelKeyDeletion = deleteDialog.querySelector('#cancelKeyDeletion');
+
+            function showDeleteDialog(key, name){
+
+                deleteDialog.querySelector('strong#keyForDeletion').textContent = name;
+                confirmKeyDeletion.dataset.key = key
+
+                deleteDialog.dataset.active = "true";
+
+            }
+
+            confirmDeleteBtn.addEventListener('click', function(e){
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+
+                fetch('/keys/delete', {
+                        method : "POST",
+                        credentials : "include",
+                        headers : {
+                            "Content-Type" : "application/json"
+                        },
+                        body : JSON.stringify({
+                            key : this.dataset.key
+                        })
+                    })
+                    .then(function(response){
+                        if(response.ok){
+                            window.location.reload();
+                        } else {
+                            throw response
+                        }
+                    })
+                    .catch(function(err){
+                        console.log(err);
+                    })
+                ;
+
+            }, false);
+
+            cancelKeyDeletion.addEventListener('click', function(e){
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+
+                confirmDeleteBtn.dataset.key = "";
+
+                deleteDialog.dataset.active = "false";
+
+            }, false);
+
+            fetch('/keys/list', {
+                    credentials : 'include'
+                })
+                .then( function(response){
+                    if(response.ok){
+                        return response.json();
+                    } else {
+                        throw response;
+                    }
+                })
+                .then(results => {
+                    console.log(results);
+
+                    var keyTableDocumentFragment = document.createDocumentFragment();
+
+                    results.data.forEach(function(keyInfo){
+
+                        var row = document.createElement('tr');
+
+                        var name = document.createElement('td');
+                        var key = document.createElement('td');
+                        var createdBy = document.createElement('td');
+                        var creationDate = document.createElement('td');
+                        var deleteKeyHolder = document.createElement('td');
+                        var deleteKeyAction = document.createElement('a');
+
+                        name.textContent = keyInfo.name;
+                        key.textContent = keyInfo._id;
+                        createdBy.textContent = keyInfo.owner;
+                        creationDate.textContent = new Date(keyInfo.created);
+
+                        deleteKeyAction.href = "#"
+                        deleteKeyAction.dataset.key = keyInfo._id;
+                        deleteKeyAction.dataset.keyname = keyInfo.name;
+                        deleteKeyAction.textContent = "Delete";
+
+                        deleteKeyAction.addEventListener('click', function(e){
+                            e.preventDefault();
+                            e.stopImmediatePropagation();
+
+                            console.log(this.dataset.key, this.dataset.keyname);
+
+                            showDeleteDialog(this.dataset.key, this.dataset.keyname);
+
+                        }, false);
+
+                        deleteKeyHolder.appendChild(deleteKeyAction);
+
+                        row.appendChild(name);
+                        row.appendChild(key);
+                        row.appendChild(createdBy);
+                        row.appendChild(creationDate);
+                        row.appendChild(deleteKeyHolder);
+
+                        keyTableDocumentFragment.appendChild(row)
+
+                    });
+
+                    existingKeysTableBody.appendChild(keyTableDocumentFragment);
+
+                })
+                .catch(function(err){
+                    console.log(err);
+                })
+            ;
+
+            createNewKeyForm.addEventListener('submit', function(e){
+                e.preventDefault();
+                e.stopImmediatePropagation();
+
+                var keyname = this[0].value;
+
+                fetch('/keys/create', {
+                        method : "POST",
+                        credentials : "include",
+                        headers : {
+                            "Content-Type" : "application/json"
+                        },
+                        body : JSON.stringify( { keyname : keyname } ),
+                    })
+                    .then(function(res){
+                        if(res.ok){
+                            window.location.reload();
+                        } else {
+                            throw res;
+                        }
+                    })
+                    .catch(function(err){
+                        console.log(err);
+                    })
+                ;
+
+            }, false);
+
+        }());
+
+    </script>
+
+</html>
