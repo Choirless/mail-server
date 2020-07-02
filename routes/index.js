@@ -68,12 +68,13 @@ router.post('/send/:TEMPLATE', function(req, res, next) {
 		}
 
 		req.body.html = templates[req.params.TEMPLATE](req.body.info);
-		
-		res.send(req.body.html);
 
 		mail.send(req.body)
 			.then(function(){
-				res.end();
+				res.json({
+					"status" : "ok",
+					"msg" : "Email successfully sent"
+				});
 			})
 			.catch(err => {
 				debug(err);
