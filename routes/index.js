@@ -62,12 +62,18 @@ router.post('/send/:TEMPLATE', function(req, res, next) {
 
 		if(!templates[req.params.TEMPLATE]){
 			
-			const source = fs.readFileSync(`${__dirname}/../views/${req.params.TEMPLATE}.hbs`, 'utf8');
-			templates[req.params.TEMPLATE] = Handlebars.compile(source);
+			const HTMLTemplateSource = fs.readFileSync(`${__dirname}/../views/html/${req.params.TEMPLATE}.hbs`, 'utf8');
+			const plaintextTemplateSource = fs.readFileSync(`${__dirname}/../views/text/${req.params.TEMPLATE}.hbs`, 'utf8');
+			
+			templates[req.params.TEMPLATE] = {
+				text : Handlebars.compile(plaintextTemplateSource),
+				html : Handlebars.compile(HTMLTemplateSource)
+			};
 
 		}
 
-		req.body.html = templates[req.params.TEMPLATE](req.body.info);
+		req.body.text = templates[req.params.TEMPLATE].text(req.body.info);
+		req.body.html = templates[req.params.TEMPLATE].html(req.body.info);
 
 		mail.send(req.body)
 			.then(function(){
