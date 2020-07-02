@@ -9,7 +9,8 @@ function sendMail(msgInfo){
         to: msgInfo.to,
         from: process.env.SENDGRID_SENDER,
         subject: msgInfo.subject,
-        text: msgInfo.text
+        text: msgInfo.text,
+        html : msgInfo.html
     };
 
     return sgMail.send(msg)
