@@ -48,7 +48,7 @@ router.post('/send', function(req, res) {
 
 router.post('/send/:TEMPLATE', function(req, res, next) {
 
-	const validTemplates = ['welcome', 'forgot-password', 'invitation'];
+	const validTemplates = ['welcome', 'forgot-password', 'invitation', 'beta'];
 
 	if(validTemplates.indexOf(req.params.TEMPLATE) === -1){
 	
@@ -62,8 +62,8 @@ router.post('/send/:TEMPLATE', function(req, res, next) {
 
 		if(!templates[req.params.TEMPLATE]){
 			
-			const HTMLTemplateSource = fs.readFileSync(`${__dirname}/../views/html/${req.params.TEMPLATE}.hbs`, 'utf8');
 			const plaintextTemplateSource = fs.readFileSync(`${__dirname}/../views/text/${req.params.TEMPLATE}.hbs`, 'utf8');
+			const HTMLTemplateSource = fs.readFileSync(`${__dirname}/../views/html/${req.params.TEMPLATE}.hbs`, 'utf8');
 			
 			templates[req.params.TEMPLATE] = {
 				text : Handlebars.compile(plaintextTemplateSource),
