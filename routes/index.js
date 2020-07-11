@@ -30,7 +30,10 @@ router.post('/send', function(req, res) {
 
 		mail.send(req.body)
 			.then(function(){
-				res.end();
+				res.json({
+					status : "ok",
+					msg : "Email successfully sent."
+				});
 			})
 			.catch(err => {
 				debug(err);
