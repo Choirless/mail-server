@@ -7,7 +7,10 @@ function sendMail(msgInfo){
 
     const msg = {
         to: msgInfo.to,
-        from: process.env.SENDGRID_SENDER,
+        from: {
+            email : process.env.SENDGRID_SENDER_EMAIL,
+            name : process.env.SENDGRID_SENDER_NAME
+        },
         subject: msgInfo.subject,
         text: msgInfo.text,
         html : msgInfo.html
