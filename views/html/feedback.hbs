@@ -1,33 +1,41 @@
-<table>
-    <tr></tr>
-    <tr>
-        <td>{{user}} has sent some feedback for the Choirless beta.</td>
-    </tr>
+<html>
 
-    <tr>
-        <td>Here's what they said:</td>
-    </tr>
+<body>
 
-    <tr>
-        <td>Title: {{title}}</td>
-    </tr>
-
-    <tr>
-        <td>Page: {{page}}</td>
-    </tr>
-
-    <tr>
-        <td>Feedback:</td>
-    </tr>
-
-    <tr>
-        <td>{{content}}</td>
-    </tr>
-
-    {{#if screenshot}}
+    <table>
+        <tr></tr>
         <tr>
-            <td><img src="{{screenshot}}" alt="Choirless feedback screenshot" /></td>
+            <td>{{user}} has sent some feedback for the Choirless beta.</td>
         </tr>
-    {{/if}}
 
-</table>
+        <tr>
+            <td>Here's what they said:</td>
+        </tr>
+
+        <tr>
+            <td>Title: {{title}}</td>
+        </tr>
+
+        <tr>
+            <td>Page: {{page}}</td>
+        </tr>
+
+        <tr>
+            <td>Feedback:</td>
+        </tr>
+
+        <tr>
+            <td>{{content}}</td>
+        </tr>
+
+        {{#if screenshot}}
+            <tr>
+                <td><img src="{{{screenshot}}}" alt="Choirless feedback screenshot" /></td>
+            </tr>
+        {{/if}}
+
+    </table>
+
+    </body>
+
+</html>
