@@ -51,7 +51,7 @@ router.post('/send', function(req, res) {
 
 router.post('/send/:TEMPLATE', function(req, res, next) {
 
-	const validTemplates = ['welcome', 'forgot-password', 'invitation', 'beta'];
+	const validTemplates = ['welcome', 'forgot-password', 'invitation', 'beta', 'feedback'];
 
 	if(validTemplates.indexOf(req.params.TEMPLATE) === -1){
 	
