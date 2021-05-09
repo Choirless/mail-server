@@ -11,7 +11,7 @@
     "debug": "^2.6.9",
     "dotenv": "^8.2.0",
     "express": "~4.16.1",
-    "handlebars": "^4.7.6",
+    "handlebars": "^4.7.7",
     "http-errors": "~1.6.3",
     "kuuid": "^0.5.1",
     "lru-cache": "^5.1.1",
